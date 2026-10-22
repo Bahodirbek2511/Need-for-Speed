@@ -552,7 +552,7 @@ public final class NightRushView extends SurfaceView implements SurfaceHolder.Ca
             c.drawPath(shell, p);
             p.setStyle(Paint.Style.FILL);
         } else if (kind == 1) {
-            p.setColor(Color.argb(210, GOLD));
+            p.setColor(Color.argb(210, Color.red(GOLD), Color.green(GOLD), Color.blue(GOLD)));
             c.drawRect(cx - cw * 0.16f, cy + ch * 0.43f, cx + cw * 0.16f, cy + ch * 0.48f, p);
         }
     }
