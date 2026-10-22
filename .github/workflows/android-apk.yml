@@ -68,7 +68,7 @@ jobs:
           unzip -tq "$APK"
           echo "APK size: $SIZE bytes"
           ls -lh "$APK"
-          AAPT="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f \\( -name aapt -o -name aapt2 \\) -perm -u+x | sort -V | tail -n 1)"
+          AAPT="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f \( -name aapt -o -name aapt2 \) -perm -u+x | sort -V | tail -n 1)"
           if [[ -z "$AAPT" ]]; then
             echo "ERROR: no executable aapt/aapt2 found under $ANDROID_HOME/build-tools"
             find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f | head -50
