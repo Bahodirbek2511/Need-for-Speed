@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: android-apk-${{ github.ref }}
+  group: android-apk-run-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
@@ -47,10 +47,16 @@ jobs:
           SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | sort | tail -n 1)"
           "$SDKMANAGER" --install "platforms;android-35" "build-tools;35.0.0"
 
-      - name: Set up Gradle 8.7
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
+      - name: Install Gradle 8.7
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --retry-delay 2 \
+            https://services.gradle.org/distributions/gradle-8.7-bin.zip \
+            --output "$RUNNER_TEMP/gradle-8.7-bin.zip"
+          unzip -q "$RUNNER_TEMP/gradle-8.7-bin.zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/gradle-8.7/bin" >> "$GITHUB_PATH"
+          gradle --version
 
       - name: Compile debug APK
         run: gradle --no-daemon --stacktrace :app:assembleDebug
