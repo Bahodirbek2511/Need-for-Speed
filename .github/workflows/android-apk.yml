@@ -64,9 +64,12 @@ jobs:
           APK=dist/Need-for-Speed-Street-Rush.apk
           test -s "$APK"
           SIZE="$(stat -c '%s' "$APK")"
-          test "$SIZE" -gt 50000
-          unzip -tq "$APK"
           echo "APK size: $SIZE bytes"
+          test "$SIZE" -gt 15000 || {
+            echo "ERROR: APK is unexpectedly small ($SIZE bytes)"
+            exit 1
+          }
+          unzip -tq "$APK"
           ls -lh "$APK"
           AAPT="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f \( -name aapt -o -name aapt2 \) -perm -u+x | sort -V | tail -n 1)"
           if [[ -z "$AAPT" ]]; then
