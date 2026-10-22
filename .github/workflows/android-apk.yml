@@ -66,11 +66,27 @@ jobs:
           SIZE="$(stat -c '%s' "$APK")"
           test "$SIZE" -gt 50000
           unzip -tq "$APK"
-          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" > dist/apk-badging.txt
-          grep -q "package: name='uz.bahodirbek.nfsstreetrush'" dist/apk-badging.txt
-          grep -q "launchable-activity:" dist/apk-badging.txt
+          echo "APK size: $SIZE bytes"
+          ls -lh "$APK"
+          AAPT="$(find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f \\( -name aapt -o -name aapt2 \\) -perm -u+x | sort -V | tail -n 1)"
+          if [[ -z "$AAPT" ]]; then
+            echo "ERROR: no executable aapt/aapt2 found under $ANDROID_HOME/build-tools"
+            find "$ANDROID_HOME/build-tools" -maxdepth 2 -type f | head -50
+            exit 1
+          fi
+          echo "Using APK inspector: $AAPT"
+          "$AAPT" dump badging "$APK" | tee dist/apk-badging.txt
+          grep -q "package: name='uz.bahodirbek.nfsstreetrush'" dist/apk-badging.txt || {
+            echo "ERROR: package id check failed; actual manifest output:"
+            cat dist/apk-badging.txt
+            exit 1
+          }
+          grep -q "launchable-activity:" dist/apk-badging.txt || {
+            echo "ERROR: launcher activity check failed; actual manifest output:"
+            cat dist/apk-badging.txt
+            exit 1
+          }
           echo "APK verification passed: $SIZE bytes"
-          grep -E "^(package:|sdkVersion:|targetSdkVersion:|launchable-activity:)" dist/apk-badging.txt || true
           sha256sum "$APK" | tee dist/SHA256SUMS.txt
 
       - name: Upload verified APK artifact
